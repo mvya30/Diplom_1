@@ -5,6 +5,8 @@ class TestBurger:
 
     def test_initial_state(self, burger):
         assert burger.bun is None
+        
+    def test_initial_ingredients(self, burger):
         assert burger.ingredients == []
 
     def test_set_buns(self, burger, bun):
@@ -24,8 +26,9 @@ class TestBurger:
 
     @pytest.mark.parametrize('index', [-1, 5])
     def test_remove_invalid_index(self, burger, index):
-        with pytest.raises(IndexError):
+        with pytest.raises(IndexError) as exc_info:
             burger.remove_ingredient(index)
+        assert exc_info.type is IndexError
 
     @pytest.mark.parametrize(
         'from_idx, to_idx, expected',
@@ -58,9 +61,14 @@ class TestBurger:
         burger.add_ingredient(sauce)
         burger.add_ingredient(filling)
 
-        receipt = burger.get_receipt()
-        assert '(==== Default bun ====)' in receipt
-        assert '= sauce Sauce =' in receipt
-        assert '= filling Filling =' in receipt
-        assert 'Price: 270.0' in receipt
+        expected_recept = (
+            "(==== Default bun ====)\n" 
+            "= sauce Sauce =\n"
+            "= filling Filling =\n"
+            "(==== Default bun ====)\n"
+            "\n"
+            "Price: 270.0"
+        )
+
+        assert burger.get_receipt() == expected_recept
         
